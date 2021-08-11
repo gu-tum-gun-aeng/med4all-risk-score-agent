@@ -24,7 +24,8 @@
     "untracked",
     "kafkajs",
     "Ampur",
-    "dyslipidemia"
+    "dyslipidemia",
+    "uuidv4"
   ],
   "flagWords": [],
   "ignorePaths": [

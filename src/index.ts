@@ -1,34 +1,39 @@
-import { Patient } from "./lib/model";
-import { processRiskScore } from "./lib/process";
+import KafkaTopics from "./constants/kafkaTopics"
+import { Patient } from "./lib/model"
+import { processRiskScore } from "./lib/process"
+import messageQueue from "./messageQueue"
 
-import messageQueue from "./messageQueue";
+const { producer, consumer } = messageQueue.init()
 
-const RAW_TOPIC = "patient.raw.main";
-const PATIENT_WITH_RISK_SCORE_TOPIC = "patient.with-risk-score.main";
-const DEAD_LETTER_QUEUE_TOPIC = "patient.with-risk-score.dlq";
-
-messageQueue.init();
-
-const run = async () => {
-  await messageQueue.consume(RAW_TOPIC, processMessage);
-};
-run().catch(console.error);
+const run = async () =>
+  await messageQueue.consume(consumer, KafkaTopics.RAW_TOPIC, processMessage)
+run().catch(console.error)
 
 export async function processMessage(message: string): Promise<void> {
   try {
-    const patient: Patient = JSON.parse(message);
-    await processRiskScore(patient);
-    await sendToPatientWithRiskScoreQueue(message);
+    const patient: Patient = JSON.parse(message)
+    const riskScore = await processRiskScore(patient)
+    await sendToPatientWithRiskScoreQueue(JSON.stringify(riskScore))
   } catch (error) {
-    console.error(error);
-    await sendToDeadLetterQueue(message);
+    console.error(error)
+    await sendToDeadLetterQueue(message)
   }
 }
 
-async function sendToDeadLetterQueue(message: string): Promise<void> {
-  messageQueue.publish(DEAD_LETTER_QUEUE_TOPIC, message);
+const sendToDeadLetterQueue = async (message: string): Promise<void> => {
+  await messageQueue.publish(
+    producer,
+    KafkaTopics.DEAD_LETTER_QUEUE_TOPIC,
+    message
+  )
 }
 
-async function sendToPatientWithRiskScoreQueue(message: string): Promise<void> {
-  messageQueue.publish(PATIENT_WITH_RISK_SCORE_TOPIC, message);
+const sendToPatientWithRiskScoreQueue = async (
+  message: string
+): Promise<void> => {
+  await messageQueue.publish(
+    producer,
+    KafkaTopics.PATIENT_WITH_RISK_SCORE_TOPIC,
+    message
+  )
 }
