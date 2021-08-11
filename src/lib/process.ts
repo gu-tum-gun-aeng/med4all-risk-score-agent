@@ -3,7 +3,7 @@ import * as querystring from "querystring"
 import axios from "axios"
 import dayjs from "dayjs"
 
-import riskscoreApi from "../config/riskscore-api"
+import riskScoreApi from "../config/risk-score-api"
 
 import {
   ApiRequestBody,
@@ -53,7 +53,7 @@ export const processRiskScore = async (
     Connection: "keep-alive",
   } as const
   const riskScoreResponse = await axios.post<RiskScoreResponse>(
-    riskscoreApi.RISK_SCORE_ENDPOINT,
+    riskScoreApi.RISK_SCORE_ENDPOINT,
     querystring.stringify(requestBody),
     { headers: requestHeader }
   )
