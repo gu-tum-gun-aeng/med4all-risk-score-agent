@@ -25,7 +25,10 @@
     "kafkajs",
     "Ampur",
     "dyslipidemia",
-    "uuidv4"
+    "uuidv4",
+    "uuidv",
+    "nhso",
+    "NHSO"
   ],
   "flagWords": [],
   "ignorePaths": [

@@ -51,7 +51,7 @@ export const processRiskScore = async (
     Accept: "*/*",
     "Accept-Encoding": "gzip, deflate, br",
     Connection: "keep-alive",
-  }
+  } as const
   const riskScoreResponse = await axios.post<RiskScoreResponse>(
     scoreUrlEndpoint,
     querystring.stringify(requestBody),
@@ -64,13 +64,11 @@ export const processRiskScore = async (
   return patientWithRiskScore
 }
 
-// it seems we cannot have more than 2 genders ?
-// meh
-type Gender = "male" | "female" | "unknown"
+type NHSOGender = "male" | "female" | "unknown"
 
 const mapGenderCode = (
   genderCode: GenderCode | undefined
-): undefined | Gender => {
+): undefined | NHSOGender => {
   if (genderCode === undefined) {
     return
   }

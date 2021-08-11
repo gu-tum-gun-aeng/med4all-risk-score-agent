@@ -1,4 +1,5 @@
 import axios from "axios"
+import _ from "lodash"
 
 import {
   GenderCode,
@@ -38,27 +39,40 @@ const buildPatientInfo = (): Patient => {
   }
 }
 
-test("processRiskScore should return correct PatientWithRiskScore if we put patient object with full information", async () => {
-  const expectedResultFromApi: RiskScoreResponse = {
-    inclusion_label: "R2",
-    inclusion_label_type: "normal",
-    triage_score: 136,
-  }
+describe("Process", () => {
+  test("processRiskScore should return correct PatientWithRiskScore if we put patient object with full information", async () => {
+    const expectedResultFromApi: RiskScoreResponse = {
+      inclusion_label: "R2",
+      inclusion_label_type: "normal",
+      triage_score: 136,
+    }
 
-  const patientInfo: Patient = buildPatientInfo()
+    const patientInfo: Patient = buildPatientInfo()
 
-  const spyOnAxiosPost = jest
-    .spyOn(axios, "post")
-    .mockResolvedValue({ data: expectedResultFromApi })
+    const spyOnAxiosPost = jest
+      .spyOn(axios, "post")
+      .mockResolvedValue({ data: expectedResultFromApi })
 
-  const result: PatientWithRiskScore = await processRiskScore(patientInfo)
+    const result: PatientWithRiskScore = await processRiskScore(patientInfo)
 
-  const expected = {
-    ...patientInfo,
-    riskScore: expectedResultFromApi,
-  }
-  expect(spyOnAxiosPost).toHaveBeenCalled()
-  expect(result).toEqual(expected)
+    const expected = {
+      ...patientInfo,
+      riskScore: expectedResultFromApi,
+    }
+    expect(spyOnAxiosPost).toHaveBeenCalled()
+    expect(result).toEqual(expected)
 
-  spyOnAxiosPost.mockRestore()
+    spyOnAxiosPost.mockRestore()
+  })
+
+  test("processRiskScore should throw error if no patient data of age", async () => {
+    const patientInfo = buildPatientInfo()
+    const mockPatientWithoutAge: Omit<Patient, "cdPersonAge"> = _.omit(
+      patientInfo,
+      "cdPersonAge"
+    )
+    expect(processRiskScore(mockPatientWithoutAge)).rejects.toEqual(
+      new Error("no cd person age")
+    )
+  })
 })
