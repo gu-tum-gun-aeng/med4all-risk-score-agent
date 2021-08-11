@@ -1,25 +1,15 @@
+import axios from "axios"
+
 import {
   GenderCode,
   Patient,
   PatientWithRiskScore,
   RiskScoreResponse,
-} from "./model";
-import { processRiskScore } from "./process";
-import axios from "axios";
+} from "./model"
+import { processRiskScore } from "./process"
 
-jest.mock("axios");
-const mockedAxios = axios as jest.Mocked<typeof axios>;
-
-test("processRiskScore should return correct PatientWithRiskScore if we put patient object with full information", async () => {
-  const expectedResultFromApi: RiskScoreResponse = {
-    inclusion_label: "R2",
-    inclusion_label_type: "normal",
-    triage_score: 136,
-  };
-
-  mockedAxios.post.mockResolvedValue({ data: expectedResultFromApi });
-
-  const patientInfo: Patient = {
+const buildPatientInfo = (): Patient => {
+  return {
     cdPersonAge: 20,
     cdPersonPhone1: "0845784598",
     crAmpurCode: "5",
@@ -45,14 +35,30 @@ test("processRiskScore should return correct PatientWithRiskScore if we put pati
     emPatientBedriddenStatus: true,
     emPatientSymptomsCL8: true,
     emPatientSymptomsCL13: true,
-  };
+  }
+}
 
-  const result: PatientWithRiskScore = await processRiskScore(patientInfo);
+test("processRiskScore should return correct PatientWithRiskScore if we put patient object with full information", async () => {
+  const expectedResultFromApi: RiskScoreResponse = {
+    inclusion_label: "R2",
+    inclusion_label_type: "normal",
+    triage_score: 136,
+  }
+
+  const patientInfo: Patient = buildPatientInfo()
+
+  const spyOnAxiosPost = jest
+    .spyOn(axios, "post")
+    .mockResolvedValue({ data: expectedResultFromApi })
+
+  const result: PatientWithRiskScore = await processRiskScore(patientInfo)
 
   const expected = {
     ...patientInfo,
     riskScore: expectedResultFromApi,
-  };
-  expect(mockedAxios.post).toHaveBeenCalled();
-  expect(result).toEqual(expected);
-});
+  }
+  expect(spyOnAxiosPost).toHaveBeenCalled()
+  expect(result).toEqual(expected)
+
+  spyOnAxiosPost.mockRestore()
+})
