@@ -10,7 +10,7 @@ import {
 } from "./model"
 import { processRiskScore } from "./process"
 
-const buildPatientInfo = (): Patient => {
+export const buildPatientInfo = (): Patient => {
   return {
     cdPersonAge: 20,
     cdPersonPhone1: "0845784598",

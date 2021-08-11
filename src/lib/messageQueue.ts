@@ -5,7 +5,7 @@ import KafkaConfig from "../config/kafka"
 import KafkaTopics from "../constants/kafkaTopics"
 
 import { Patient } from "./model"
-import { processRiskScore } from "./process"
+import * as Process from "./process"
 
 type KafkaInstance = {
   readonly producer: Producer
@@ -34,25 +34,24 @@ const publish = async (
   await producer.disconnect()
 }
 
-const processEachMessage = async (
+export const processEachMessage = async (
   partition: number,
-  message: KafkaMessage,
+  message: Partial<KafkaMessage>,
   producer: Producer
 ): Promise<void> => {
+  if (message.value === null || message.value === undefined) return
+  const messageBuffer = message.value.toString()
+
   console.log({
     partition,
     offset: message.offset,
     value: message.value?.toString(),
   })
 
-  if (message.value === null) return
-
-  const messageBuffer = message.value.toString()
-
   try {
     const patient: Patient = JSON.parse(messageBuffer)
-    const riskScore = await processRiskScore(patient)
-    await publish(
+    const riskScore = await Process.processRiskScore(patient)
+    await messageQueue.publish(
       producer,
       KafkaTopics.PATIENT_WITH_RISK_SCORE_TOPIC,
       JSON.stringify(riskScore)
