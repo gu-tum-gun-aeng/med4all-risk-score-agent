@@ -1,6 +1,10 @@
 import { Consumer, Kafka, Producer } from "kafkajs"
 
 import KafkaConfig from "../config/kafka"
+import KafkaTopics from "../constants/kafkaTopics"
+
+import { Patient } from "./model"
+import { processRiskScore } from "./process"
 
 type KafkaInstance = {
   readonly producer: Producer
@@ -18,8 +22,9 @@ const init = (kafka: Kafka): KafkaInstance => {
 
 const consume = async (
   consumer: Consumer,
+  producer: Producer,
   topic: string,
-  cb: (message: string) => Promise<void>
+  cb: (message: string, producer: Producer) => Promise<void>
 ) => {
   await consumer.connect()
   await consumer.subscribe({ topic: topic, fromBeginning: true })
@@ -34,7 +39,7 @@ const consume = async (
 
       if (message.value === null) return
 
-      cb(message.value.toString())
+      cb(message.value.toString(), producer)
     },
   })
   await consumer.disconnect()
@@ -57,6 +62,37 @@ const messageQueue = {
   init,
   consume,
   publish,
+}
+
+export const run = async (consumer: Consumer, producer: Producer) => {
+  await messageQueue.consume(
+    consumer,
+    producer,
+    KafkaTopics.RAW_TOPIC,
+    (message, producer) => processMessage(message, producer)
+  )
+}
+
+const processMessage = async (
+  message: string,
+  producer: Producer
+): Promise<void> => {
+  try {
+    const patient: Patient = JSON.parse(message)
+    const riskScore = await processRiskScore(patient)
+    await messageQueue.publish(
+      producer,
+      KafkaTopics.PATIENT_WITH_RISK_SCORE_TOPIC,
+      JSON.stringify(riskScore)
+    )
+  } catch (error) {
+    console.error(error)
+    await messageQueue.publish(
+      producer,
+      KafkaTopics.DEAD_LETTER_QUEUE_TOPIC,
+      message
+    )
+  }
 }
 
 export default messageQueue
