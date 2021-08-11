@@ -1,4 +1,5 @@
-import { Consumer, Kafka, Producer } from "kafkajs"
+import { Consumer, Kafka, KafkaMessage, Producer } from "kafkajs"
+import _ from "lodash"
 
 import KafkaConfig from "../config/kafka"
 import KafkaTopics from "../constants/kafkaTopics"
@@ -20,31 +21,6 @@ const init = (kafka: Kafka): KafkaInstance => {
   }
 }
 
-const consume = async (
-  consumer: Consumer,
-  producer: Producer,
-  topic: string,
-  cb: (message: string, producer: Producer) => Promise<void>
-) => {
-  await consumer.connect()
-  await consumer.subscribe({ topic: topic, fromBeginning: true })
-
-  await consumer.run({
-    eachMessage: async ({ partition, message }) => {
-      console.log({
-        partition,
-        offset: message.offset,
-        value: message.value?.toString(),
-      })
-
-      if (message.value === null) return
-
-      cb(message.value.toString(), producer)
-    },
-  })
-  await consumer.disconnect()
-}
-
 const publish = async (
   producer: Producer,
   topic: string,
@@ -58,41 +34,57 @@ const publish = async (
   await producer.disconnect()
 }
 
-const messageQueue = {
-  init,
-  consume,
-  publish,
-}
-
-export const run = async (consumer: Consumer, producer: Producer) => {
-  await messageQueue.consume(
-    consumer,
-    producer,
-    KafkaTopics.RAW_TOPIC,
-    (message, producer) => processMessage(message, producer)
-  )
-}
-
-const processMessage = async (
-  message: string,
+const processEachMessage = async (
+  partition: number,
+  message: KafkaMessage,
   producer: Producer
 ): Promise<void> => {
+  console.log({
+    partition,
+    offset: message.offset,
+    value: message.value?.toString(),
+  })
+
+  if (message.value === null) return
+
+  const messageBuffer = message.value.toString()
+
   try {
-    const patient: Patient = JSON.parse(message)
+    const patient: Patient = JSON.parse(messageBuffer)
     const riskScore = await processRiskScore(patient)
-    await messageQueue.publish(
+    await publish(
       producer,
       KafkaTopics.PATIENT_WITH_RISK_SCORE_TOPIC,
       JSON.stringify(riskScore)
     )
   } catch (error) {
     console.error(error)
-    await messageQueue.publish(
-      producer,
-      KafkaTopics.DEAD_LETTER_QUEUE_TOPIC,
-      message
-    )
+    await publish(producer, KafkaTopics.DEAD_LETTER_QUEUE_TOPIC, messageBuffer)
   }
+}
+
+const process = async (
+  consumer: Consumer,
+  producer: Producer,
+  topic: string
+) => {
+  await consumer.connect()
+  await consumer.subscribe({ topic: topic, fromBeginning: true })
+
+  await consumer.run({
+    eachMessage: async ({ partition, message }) =>
+      await processEachMessage(partition, message, producer),
+  })
+}
+
+const messageQueue = {
+  init,
+  process,
+  publish,
+}
+
+export const run = async (consumer: Consumer, producer: Producer) => {
+  await messageQueue.process(consumer, producer, KafkaTopics.RAW_TOPIC)
 }
 
 export default messageQueue
