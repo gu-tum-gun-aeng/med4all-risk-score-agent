@@ -37,6 +37,7 @@
     "yarn.lock",
     "tsconfig.json",
     "node_modules/**",
-    "src/lib/model.ts"
+    "src/lib/model.ts",
+    "LICENSE"
   ]
 }

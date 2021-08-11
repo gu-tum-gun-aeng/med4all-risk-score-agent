@@ -2,9 +2,9 @@ import { Kafka } from "kafkajs"
 
 import KafkaConfig from "./config/kafka"
 import KafkaTopics from "./constants/kafkaTopics"
+import messageQueue from "./lib/messageQueue"
 import { Patient } from "./lib/model"
 import { processRiskScore } from "./lib/process"
-import messageQueue from "./messageQueue"
 
 const kafka: Kafka = new Kafka({
   clientId: KafkaConfig.CLIENT_ID,
@@ -16,7 +16,7 @@ const run = async () =>
   await messageQueue.consume(consumer, KafkaTopics.RAW_TOPIC, processMessage)
 run().catch(console.error)
 
-export async function processMessage(message: string): Promise<void> {
+const processMessage = async (message: string): Promise<void> => {
   try {
     const patient: Patient = JSON.parse(message)
     const riskScore = await processRiskScore(patient)

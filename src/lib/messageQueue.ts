@@ -1,6 +1,6 @@
 import { Consumer, Kafka, Producer } from "kafkajs"
 
-import KafkaConfig from "./config/kafka"
+import KafkaConfig from "../config/kafka"
 
 type KafkaInstance = {
   readonly producer: Producer
