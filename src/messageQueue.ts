@@ -1,22 +1,15 @@
 import { Consumer, Kafka, Producer } from "kafkajs"
-import { v4 as uuidv4 } from "uuid"
 
-const CLIENT_ID = `med4all-waiting-list-agent-${uuidv4()}`
-const BROKER_LIST = ["localhost:9092"]
-const GROUP_ID = "test-group"
+import KafkaConfig from "./config/kafka"
 
 type KafkaInstance = {
   readonly producer: Producer
   readonly consumer: Consumer
 }
 
-const init = (): KafkaInstance => {
-  const kafka: Kafka = new Kafka({
-    clientId: CLIENT_ID,
-    brokers: BROKER_LIST,
-  })
+const init = (kafka: Kafka): KafkaInstance => {
   const producer: Producer = kafka.producer()
-  const consumer: Consumer = kafka.consumer({ groupId: GROUP_ID })
+  const consumer: Consumer = kafka.consumer({ groupId: KafkaConfig.GROUP_ID })
   return {
     producer,
     consumer,

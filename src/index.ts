@@ -1,9 +1,16 @@
+import { Kafka } from "kafkajs"
+
+import KafkaConfig from "./config/kafka"
 import KafkaTopics from "./constants/kafkaTopics"
 import { Patient } from "./lib/model"
 import { processRiskScore } from "./lib/process"
 import messageQueue from "./messageQueue"
 
-const { producer, consumer } = messageQueue.init()
+const kafka: Kafka = new Kafka({
+  clientId: KafkaConfig.CLIENT_ID,
+  brokers: KafkaConfig.BROKER_LIST,
+})
+const { producer, consumer } = messageQueue.init(kafka)
 
 const run = async () =>
   await messageQueue.consume(consumer, KafkaTopics.RAW_TOPIC, processMessage)
