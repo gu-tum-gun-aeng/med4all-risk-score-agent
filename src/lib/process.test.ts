@@ -1,25 +1,23 @@
-import test from "ava"
-import axios from "axios"
-import sinon from "sinon"
-
 import {
   GenderCode,
   Patient,
   PatientWithRiskScore,
   RiskScoreResponse,
-} from "./model"
-import { processRiskScore } from "./process"
+} from "./model";
+import { processRiskScore } from "./process";
+import axios from "axios";
 
-test("processRiskScore should return correct PatientWithRiskScore if we put patient object with full information", async (t: any) => {
+jest.mock("axios");
+const mockedAxios = axios as jest.Mocked<typeof axios>;
+
+test("processRiskScore should return correct PatientWithRiskScore if we put patient object with full information", async () => {
   const expectedResultFromApi: RiskScoreResponse = {
     inclusion_label: "R2",
     inclusion_label_type: "normal",
     triage_score: 136,
-  }
+  };
 
-  const stub = sinon.stub(axios, "post")
-
-  stub.resolves({ data: { ...expectedResultFromApi } })
+  mockedAxios.post.mockResolvedValue({ data: expectedResultFromApi });
 
   const patientInfo: Patient = {
     cdPersonAge: 20,
@@ -47,16 +45,14 @@ test("processRiskScore should return correct PatientWithRiskScore if we put pati
     emPatientBedriddenStatus: true,
     emPatientSymptomsCL8: true,
     emPatientSymptomsCL13: true,
-  }
+  };
 
-  const result: PatientWithRiskScore = await processRiskScore(patientInfo)
+  const result: PatientWithRiskScore = await processRiskScore(patientInfo);
 
   const expected = {
     ...patientInfo,
     riskScore: expectedResultFromApi,
-  }
-
-  t.deepEqual(result, expected)
-
-  stub.restore()
-})
+  };
+  expect(mockedAxios.post).toHaveBeenCalled();
+  expect(result).toEqual(expected);
+});
