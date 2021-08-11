@@ -1,5 +1,6 @@
 import axios from "axios"
 import _ from "lodash"
+import sinon from "sinon"
 
 import {
   GenderCode,
@@ -49,9 +50,8 @@ describe("Process", () => {
 
     const patientInfo: Patient = buildPatientInfo()
 
-    const spyOnAxiosPost = jest
-      .spyOn(axios, "post")
-      .mockResolvedValue({ data: expectedResultFromApi })
+    const stubAxiosPost = sinon.stub(axios, "post")
+    stubAxiosPost.resolves({ data: expectedResultFromApi })
 
     const result: PatientWithRiskScore = await processRiskScore(patientInfo)
 
@@ -59,10 +59,9 @@ describe("Process", () => {
       ...patientInfo,
       riskScore: expectedResultFromApi,
     }
-    expect(spyOnAxiosPost).toHaveBeenCalled()
     expect(result).toEqual(expected)
 
-    spyOnAxiosPost.mockRestore()
+    stubAxiosPost.restore()
   })
 
   test("processRiskScore should throw error if no patient data of age", async () => {
