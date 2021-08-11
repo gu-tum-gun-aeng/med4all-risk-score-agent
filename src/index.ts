@@ -1,35 +1,34 @@
-import { Kafka } from "kafkajs"
+import { Patient } from "./lib/model";
+import { processRiskScore } from "./lib/process";
 
-import { Patient } from "./lib/model"
-import { processRiskScore } from "./lib/process"
+import messageQueue from "./messageQueue";
 
-const kafka = new Kafka({
-  clientId: "my-app",
-  brokers: ["kafka1:9092", "kafka2:9092"],
-})
+const RAW_TOPIC = "patient.raw.main";
+const PATIENT_WITH_RISK_SCORE_TOPIC = "patient.with-risk-score.main";
+const DEAD_LETTER_QUEUE_TOPIC = "patient.with-risk-score.dlq";
 
-const consumer = kafka.consumer({ groupId: "test-group" })
+messageQueue.init();
 
 const run = async () => {
-  await consumer.connect()
-  await consumer.subscribe({ topic: "test-topic", fromBeginning: true })
+  await messageQueue.consume(RAW_TOPIC, processMessage);
+};
+run().catch(console.error);
 
-  await consumer.run({
-    eachMessage: async ({ topic, partition, message }) => {
-      console.log({
-        partition,
-        offset: message.offset,
-        value: `${topic}: ${message.value?.toString()}`,
-      })
-
-      if (!message.value) {
-        return
-      }
-
-      const patient: Patient = JSON.parse(message.value.toString())
-      await processRiskScore(patient)
-    },
-  })
+export async function processMessage(message: string): Promise<void> {
+  try {
+    const patient: Patient = JSON.parse(message);
+    await processRiskScore(patient);
+    await sendToPatientWithRiskScoreQueue(message);
+  } catch (error) {
+    console.error(error);
+    await sendToDeadLetterQueue(message);
+  }
 }
 
-run().catch(console.error)
+async function sendToDeadLetterQueue(message: string): Promise<void> {
+  messageQueue.publish(DEAD_LETTER_QUEUE_TOPIC, message);
+}
+
+async function sendToPatientWithRiskScoreQueue(message: string): Promise<void> {
+  messageQueue.publish(PATIENT_WITH_RISK_SCORE_TOPIC, message);
+}
