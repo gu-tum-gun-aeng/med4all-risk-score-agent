@@ -3,6 +3,8 @@ import * as querystring from "querystring"
 import axios from "axios"
 import dayjs from "dayjs"
 
+import riskscoreApi from "../config/riskscore-api"
+
 import {
   ApiRequestBody,
   GenderCode,
@@ -14,8 +16,6 @@ import {
 export const processRiskScore = async (
   message: Patient
 ): Promise<PatientWithRiskScore> => {
-  const scoreUrlEndpoint = ""
-
   if (!message.cdPersonAge) {
     return Promise.reject(new Error("no cd person age"))
   }
@@ -53,7 +53,7 @@ export const processRiskScore = async (
     Connection: "keep-alive",
   } as const
   const riskScoreResponse = await axios.post<RiskScoreResponse>(
-    scoreUrlEndpoint,
+    riskscoreApi.RISK_SCORE_ENDPOINT,
     querystring.stringify(requestBody),
     { headers: requestHeader }
   )
