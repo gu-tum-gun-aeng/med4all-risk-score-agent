@@ -5,7 +5,7 @@ import KafkaConfig from "../config/kafka"
 import KafkaTopics from "../constants/kafkaTopics"
 
 import { Patient } from "./model"
-import * as Process from "./process"
+import Process from "./process"
 
 type KafkaInstance = {
   readonly producer: Producer
@@ -50,11 +50,11 @@ export const processEachMessage = async (
 
   try {
     const patient: Patient = JSON.parse(messageBuffer)
-    const riskScore = await Process.processRiskScore(patient)
+    const patientWithRiskScore = await Process.processRiskScore(patient)
     await messageQueue.publish(
       producer,
       KafkaTopics.PUBLISH_PATIENT_WITH_RISK_SCORE_TOPIC,
-      JSON.stringify(riskScore)
+      JSON.stringify(patientWithRiskScore)
     )
   } catch (error) {
     console.error(error)

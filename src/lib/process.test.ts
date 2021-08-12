@@ -8,7 +8,7 @@ import {
   PatientWithRiskScore,
   RiskScoreResponse,
 } from "./model"
-import { processRiskScore } from "./process"
+import Process from "./process"
 
 export const buildPatientInfo = (): Patient => {
   return {
@@ -53,7 +53,9 @@ describe("Process", () => {
     const stubAxiosPost = sinon.stub(axios, "post")
     stubAxiosPost.resolves({ data: expectedResultFromApi })
 
-    const result: PatientWithRiskScore = await processRiskScore(patientInfo)
+    const result: PatientWithRiskScore = await Process.processRiskScore(
+      patientInfo
+    )
 
     const expected = {
       ...patientInfo,
@@ -70,7 +72,7 @@ describe("Process", () => {
       patientInfo,
       "cdPersonAge"
     )
-    expect(processRiskScore(mockPatientWithoutAge)).rejects.toEqual(
+    expect(Process.processRiskScore(mockPatientWithoutAge)).rejects.toEqual(
       new Error("no cd person age")
     )
   })

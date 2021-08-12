@@ -13,7 +13,7 @@ import {
   RiskScoreResponse,
 } from "./model"
 
-export const processRiskScore = async (
+const processRiskScore = async (
   message: Patient
 ): Promise<PatientWithRiskScore> => {
   if (!message.cdPersonAge) {
@@ -84,4 +84,8 @@ const mapGenderCode = (
     default:
       return
   }
+}
+
+export default {
+  processRiskScore,
 }

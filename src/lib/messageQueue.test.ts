@@ -2,7 +2,7 @@ import { Kafka, Producer } from "kafkajs"
 import sinon from "sinon"
 
 import MessageQueue, { processEachMessage } from "./messageQueue"
-import * as Process from "./process"
+import Process from "./process"
 import { buildPatientInfo } from "./process.test"
 
 const mockProducerObject = {
@@ -11,7 +11,7 @@ const mockProducerObject = {
   disconnect: () => "disconnect!",
 }
 
-describe("Message Queue", () => {
+describe("init", () => {
   test("should call kafka.produce and kafka.consume when call init", async () => {
     const mockKafkaJs: unknown = {
       producer: () => "test producer",
@@ -19,7 +19,7 @@ describe("Message Queue", () => {
     }
     const mockKafka = sinon.mock(mockKafkaJs)
     mockKafka.expects("producer").once()
-    mockKafka.expects("consumer").once().calledWith({ groupId: "test groupId" })
+    mockKafka.expects("consumer").once().withArgs({ groupId: "test-group" })
     MessageQueue.init(mockKafkaJs as Kafka)
 
     mockKafka.verify()
@@ -27,31 +27,42 @@ describe("Message Queue", () => {
 })
 
 describe("processEachMessage", () => {
-  test("should kafka publish with correct params", async () => {
+  test("should kafka publish with correct params that get from process patient", async () => {
     const mockPartition = 1
     const mockMessageKafka = {
       offset: "1",
       value: Buffer.from(JSON.stringify({ test: "test" })),
     }
     const mockPatientInfo = buildPatientInfo()
+    const mockRiskScore = {
+      inclusion_label: "R2",
+      inclusion_label_type: "normal",
+      triage_score: 136,
+    }
 
     const mockProducer = sinon.mock(mockProducerObject)
     const stubProcess = sinon.stub(Process, "processRiskScore")
 
     stubProcess.resolves({
       ...mockPatientInfo,
-      riskScore: {
-        inclusion_label: "R2",
-        inclusion_label_type: "normal",
-        triage_score: 136,
-      },
+      riskScore: mockRiskScore,
     })
 
     mockProducer.expects("connect").once()
     mockProducer
       .expects("send")
       .once()
-      .calledWith({ topic: "patient.with-risk-score.main" })
+      .withArgs({
+        topic: "patient.with-risk-score.main",
+        messages: [
+          {
+            value: JSON.stringify({
+              ...mockPatientInfo,
+              riskScore: mockRiskScore,
+            }),
+          },
+        ],
+      })
 
     await processEachMessage(
       mockPartition,
@@ -60,5 +71,7 @@ describe("processEachMessage", () => {
     )
 
     mockProducer.verify()
+
+    stubProcess.restore()
   })
 })
