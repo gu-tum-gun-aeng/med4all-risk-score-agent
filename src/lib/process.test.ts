@@ -80,10 +80,6 @@ describe("Process", () => {
   })
 
   describe("mapGenderCode", () => {
-    test("should return unknown", () => {
-      expect(mapGenderCode(GenderCode.unknown)).toEqual("unknown")
-    })
-
     const mapGenderCases = [
       [GenderCode.unknown, "unknown"],
       [GenderCode.male, "male"],
