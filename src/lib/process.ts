@@ -3,7 +3,7 @@ import * as querystring from "querystring"
 import axios from "axios"
 import dayjs from "dayjs"
 
-import riskScoreApi from "../config/risk-score-api"
+import riskScoreApi from "../config/riskScoreApi"
 
 import {
   ApiRequestBody,
