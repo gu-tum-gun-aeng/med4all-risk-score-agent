@@ -53,12 +53,16 @@ export const processEachMessage = async (
     const riskScore = await Process.processRiskScore(patient)
     await messageQueue.publish(
       producer,
-      KafkaTopics.PATIENT_WITH_RISK_SCORE_TOPIC,
+      KafkaTopics.PUBLISH_PATIENT_WITH_RISK_SCORE_TOPIC,
       JSON.stringify(riskScore)
     )
   } catch (error) {
     console.error(error)
-    await publish(producer, KafkaTopics.DEAD_LETTER_QUEUE_TOPIC, messageBuffer)
+    await publish(
+      producer,
+      KafkaTopics.PUBLISH_DEAD_LETTER_QUEUE_TOPIC,
+      messageBuffer
+    )
   }
 }
 
@@ -83,7 +87,7 @@ const messageQueue = {
 }
 
 export const run = async (consumer: Consumer, producer: Producer) => {
-  await messageQueue.process(consumer, producer, KafkaTopics.RAW_TOPIC)
+  await messageQueue.process(consumer, producer, KafkaTopics.CONSUME_RAW_TOPIC)
 }
 
 export default messageQueue
