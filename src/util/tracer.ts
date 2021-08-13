@@ -34,31 +34,28 @@ export const traceWrapperAsync = async <T>(
   }
   logger.trace(ctx, `[${message} - START]`, `${target}`)
 
-  const result = await fx()
-    .then((value) => {
-      const endTime = new Date()
-      logger.trace(
-        {
-          ...ctx,
-          elapsed_milliseconds: endTime.getTime() - startTime.getTime(),
-        },
-        `[${message} - END]`,
-        `${target}${showStatus ? "::success" : ""}`
-      )
-      return value
-    })
-    .catch((err) => {
-      const endTime = new Date()
-      logger.trace(
-        {
-          ...ctx,
-          elapsed_milliseconds: endTime.getTime() - startTime.getTime(),
-        },
-        `[${message} - END]`,
-        `${target}${showStatus ? "::failed" : ""}`
-      )
-      return Promise.reject(err)
-    })
-
-  return result
+  try {
+    const result = await fx()
+    const endTime = new Date()
+    logger.trace(
+      {
+        ...ctx,
+        elapsed_milliseconds: endTime.getTime() - startTime.getTime(),
+      },
+      `[${message} - END]`,
+      `${target}${showStatus ? "::success" : ""}`
+    )
+    return result
+  } catch (error) {
+    const endTime = new Date()
+    logger.trace(
+      {
+        ...ctx,
+        elapsed_milliseconds: endTime.getTime() - startTime.getTime(),
+      },
+      `[${message} - END]`,
+      `${target}${showStatus ? "::failed" : ""}`
+    )
+    return Promise.reject(error)
+  }
 }
