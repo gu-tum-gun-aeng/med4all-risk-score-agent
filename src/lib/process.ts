@@ -14,7 +14,7 @@ import {
 } from "./model"
 
 const processRiskScore = async (
-  patient: Patient,
+  patient: Patient
 ): Promise<PatientWithRiskScore> => {
   const requestHeader = {
     "API-KEY": riskScoreApi.RISK_SCORE_API_KEY,
@@ -29,7 +29,7 @@ const processRiskScore = async (
   const riskScoreResponse = await axios.post<RiskScoreResponse>(
     riskScoreApi.RISK_SCORE_API_URL,
     querystring.stringify(requestBody),
-    { headers: requestHeader },
+    { headers: requestHeader }
   )
   const patientWithRiskScore: PatientWithRiskScore = {
     ...patient,
@@ -38,7 +38,7 @@ const processRiskScore = async (
   return patientWithRiskScore
 }
 
-type NHSOGender = "male" | "female" | "unknown";
+type NHSOGender = "male" | "female" | "unknown"
 
 const buildRequestBody = async (patient: Patient) => {
   if (!patient.cdPersonAge) {
@@ -51,7 +51,7 @@ const buildRequestBody = async (patient: Patient) => {
     height: (patient.cdPersonHeightMeasure ?? 0) / 100,
     weight: patient.cdPersonWeightMeasure,
     infected_discover_date: dayjs(patient.emLaboratoryTestDate).format(
-      "YYYY-MM-DD",
+      "YYYY-MM-DD"
     ),
     sym1_chest_tightness: +patient.emPatientSymptomsCL14!,
     rf_chronic_heart_disease: +patient.emPatientDiseaseCD8!,
@@ -74,7 +74,7 @@ const buildRequestBody = async (patient: Patient) => {
 }
 
 export const mapGenderCode = (
-  genderCode: GenderCode | undefined,
+  genderCode: GenderCode | undefined
 ): undefined | NHSOGender => {
   if (genderCode === undefined) {
     return

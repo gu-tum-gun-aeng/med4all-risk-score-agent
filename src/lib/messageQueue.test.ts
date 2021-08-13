@@ -67,7 +67,7 @@ describe("processEachMessage", () => {
     await processEachMessage(
       mockPartition,
       mockMessageKafka,
-      mockProducerObject as unknown as Producer,
+      mockProducerObject as unknown as Producer
     )
 
     mockProducer.verify()
