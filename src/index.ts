@@ -6,6 +6,7 @@ import messageQueue, { run } from "./lib/messageQueue"
 const kafka: Kafka = new Kafka({
   clientId: KafkaConfig.CLIENT_ID,
   brokers: KafkaConfig.BROKER_LIST,
+  ssl: KafkaConfig.SSL_ENABLED,
 })
 const { consumer, producer } = messageQueue.init(kafka)
 
