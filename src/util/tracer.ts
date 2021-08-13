@@ -40,6 +40,7 @@ export const traceWrapperAsync = async <T>(
     logger.trace(
       {
         ...ctx,
+        target: `${target}::success`,
         elapsed_milliseconds: endTime.getTime() - startTime.getTime(),
       },
       `[${message} - END]`,
@@ -51,6 +52,7 @@ export const traceWrapperAsync = async <T>(
     logger.trace(
       {
         ...ctx,
+        target: `${target}::failed`,
         elapsed_milliseconds: endTime.getTime() - startTime.getTime(),
       },
       `[${message} - END]`,
