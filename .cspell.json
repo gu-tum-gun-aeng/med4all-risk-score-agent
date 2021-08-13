@@ -31,7 +31,8 @@
     "NHSO",
     "rtracer",
     "serializers",
-    "fluentd"
+    "fluentd",
+    "clust"
   ],
   "flagWords": [],
   "ignorePaths": [
