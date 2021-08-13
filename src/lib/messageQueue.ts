@@ -48,12 +48,6 @@ export const processEachMessage = async (
   if (message.value === null || message.value === undefined) return
   const messageBuffer = message.value.toString()
 
-  console.log({
-    partition,
-    offset: message.offset,
-    value: message.value?.toString(),
-  })
-
   try {
     const patient: Patient = JSON.parse(messageBuffer)
     const patientWithRiskScore = await Process.processRiskScore(patient)
