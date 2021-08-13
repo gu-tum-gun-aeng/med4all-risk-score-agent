@@ -50,7 +50,8 @@
     "config": "^3.3.6",
     "dayjs": "^1.10.6",
     "kafkajs": "^1.15.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "uuid": "^3.4.0"
   },
   "devDependencies": {
     "@ava/typescript": "^1.1.1",
