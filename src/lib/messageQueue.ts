@@ -1,5 +1,4 @@
 import { Consumer, Kafka, KafkaMessage, Producer } from "kafkajs"
-import _ from "lodash"
 
 import KafkaConfig from "../config/kafka"
 import KafkaTopics from "../constants/kafkaTopics"
