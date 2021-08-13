@@ -2,6 +2,7 @@ import { Kafka } from "kafkajs"
 
 import KafkaConfig from "./config/kafka"
 import messageQueue, { run } from "./lib/messageQueue"
+import { logger } from "./util/logger"
 
 const kafka: Kafka = new Kafka({
   clientId: KafkaConfig.CLIENT_ID,
@@ -10,4 +11,4 @@ const kafka: Kafka = new Kafka({
 })
 const { consumer, producer } = messageQueue.init(kafka)
 
-run(consumer, producer).catch(console.error)
+run(consumer, producer).catch(logger.error)

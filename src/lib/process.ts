@@ -4,6 +4,7 @@ import axios from "axios"
 import dayjs from "dayjs"
 
 import riskScoreApi from "../config/riskScoreApi"
+import { traceWrapperAsync } from "../util/tracer"
 
 import {
   ApiRequestBody,
@@ -31,6 +32,19 @@ const processRiskScore = async (
     querystring.stringify(requestBody),
     { headers: requestHeader }
   )
+
+  await traceWrapperAsync(
+    async () => {
+      await axios.post<RiskScoreResponse>(
+        riskScoreApi.RISK_SCORE_API_URL,
+        querystring.stringify(requestBody),
+        { headers: requestHeader }
+      )
+    },
+    "external",
+    "riskScoreApi"
+  )
+
   const patientWithRiskScore: PatientWithRiskScore = {
     ...patient,
     riskScore: riskScoreResponse.data,

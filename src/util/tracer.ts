@@ -14,9 +14,11 @@ const logAppName = config.get("app.name")
  * @returns Promise<void>
  */
 export const traceWrapperAsync = async <T>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fx: (arg?: any) => Promise<T>,
   context: Context,
-  name: string
+  name: string,
+  showStatus?: boolean
 ): Promise<T> => {
   const functionName = name ? name : fx.name
   const message = functionName.toUpperCase()
@@ -31,12 +33,32 @@ export const traceWrapperAsync = async <T>(
     "http.target": logAppName,
   }
   logger.trace(ctx, `[${message} - START]`, `${target}`)
+
   const result = await fx()
-  const endTime = new Date()
-  logger.trace(
-    { ...ctx, elapsed_milliseconds: endTime.getTime() - startTime.getTime() },
-    `[${message} - END]`,
-    `${target}`
-  )
+    .then((value) => {
+      const endTime = new Date()
+      logger.trace(
+        {
+          ...ctx,
+          elapsed_milliseconds: endTime.getTime() - startTime.getTime(),
+        },
+        `[${message} - END]`,
+        `${target}${showStatus ? "::success" : ""}`
+      )
+      return value
+    })
+    .catch((err) => {
+      const endTime = new Date()
+      logger.trace(
+        {
+          ...ctx,
+          elapsed_milliseconds: endTime.getTime() - startTime.getTime(),
+        },
+        `[${message} - END]`,
+        `${target}${showStatus ? "::failed" : ""}`
+      )
+      return Promise.reject(err)
+    })
+
   return result
 }
