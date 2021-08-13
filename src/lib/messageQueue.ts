@@ -2,6 +2,7 @@ import { Consumer, Kafka, KafkaMessage, Producer } from "kafkajs"
 
 import KafkaConfig from "../config/kafka"
 import KafkaTopics from "../constants/kafkaTopics"
+import { traceWrapperAsync } from "../util/tracer"
 
 import { Patient } from "./model"
 import Process from "./process"
@@ -26,10 +27,16 @@ const publish = async (
   message: string
 ): Promise<void> => {
   await producer.connect()
-  await producer.send({
-    topic,
-    messages: [{ value: message }],
-  })
+  await traceWrapperAsync(
+    async () => {
+      await producer.send({
+        topic,
+        messages: [{ value: message }],
+      })
+    },
+    "external",
+    "kafkaPublish"
+  )
   await producer.disconnect()
 }
 

@@ -28,7 +28,10 @@
     "uuidv4",
     "uuidv",
     "nhso",
-    "NHSO"
+    "NHSO",
+    "rtracer",
+    "serializers",
+    "fluentd"
   ],
   "flagWords": [],
   "ignorePaths": [

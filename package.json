@@ -15,11 +15,11 @@
     "fix": "run-s fix:*",
     "fix:prettier": "prettier \"src/**/*.ts\" --write",
     "fix:lint": "eslint src --ext .ts --fix",
-    "test": "run-s build test:*",
+    "test": "NODE_ENV=test run-s build test:*",
     "test:lint": "eslint src --ext .ts",
     "test:prettier": "prettier \"src/**/*.ts\" --list-different",
     "test:spelling": "cspell \"{README.md,.github/*.md,src/**/*.ts}\"",
-    "test:unit": "jest --coverage",
+    "test:unit": "NODE_ENV=test jest --coverage",
     "check-cli": "run-s test diff-integration-tests check-integration-tests",
     "check-integration-tests": "run-s check-integration-test:*",
     "diff-integration-tests": "mkdir -p diff && rm -rf diff/test && cp -r test diff/test && rm -rf diff/test/test-*/.git && cd diff && git init --quiet && git add -A && git commit --quiet --no-verify --allow-empty -m 'WIP' && echo '\\n\\nCommitted most recent integration test output in the \"diff\" directory. Review the changes with \"cd diff && git diff HEAD\" or your preferred git diff viewer.'",
@@ -44,9 +44,15 @@
   },
   "dependencies": {
     "@bitauth/libauth": "^1.17.1",
+    "@types/bunyan": "^1.8.7",
+    "@types/config": "^0.0.39",
     "axios": "^0.21.1",
+    "bunyan": "^1.8.15",
+    "cls-rtracer": "^2.6.0",
+    "config": "^3.3.6",
     "dayjs": "^1.10.6",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "@ava/typescript": "^1.1.1",
@@ -55,6 +61,7 @@
     "@types/kafka-node": "^3.0.0",
     "@types/kafkajs": "^1.9.0",
     "@types/lodash": "^4.14.172",
+    "@types/morgan": "^1.9.3",
     "@types/node": "^16.4.13",
     "@types/sinon": "^10.0.2",
     "@types/uuid": "^8.3.1",
