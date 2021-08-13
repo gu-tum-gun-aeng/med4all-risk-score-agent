@@ -1,15 +1,21 @@
-# Common build stage
-FROM node:14.14.0-alpine3.12 as common-build-stage
+# Stage 1: Build 
+FROM node:16-alpine AS BUILDER
 
-COPY . ./app
+WORKDIR /usr/src/app
 
-WORKDIR /app
+COPY package*.json ./
+RUN npm install --force
 
-RUN npm install
+COPY . .
+RUN npm run build
+RUN npm prune --production
 
-EXPOSE 3000
+# Stage 2: Bundle 
+FROM node:16-alpine
 
-# Production build stage
-FROM common-build-stage as production-build-stage
+WORKDIR /usr/src/app
 
-CMD ["npm", "run", "start"]
+COPY --from=BUILDER /usr/src/app/build ./build
+COPY --from=BUILDER /usr/src/app/node_modules ./node_modules
+
+CMD ["node", "build/main/index"]
