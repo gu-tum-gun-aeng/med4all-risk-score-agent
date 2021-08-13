@@ -18,7 +18,7 @@ export const traceWrapperAsync = async <T>(
   fx: (arg?: any) => Promise<T>,
   context: Context,
   name: string,
-  showStatus?: boolean
+  showStatus: boolean = true
 ): Promise<T> => {
   const functionName = name ? name : fx.name
   const message = functionName.toUpperCase()
