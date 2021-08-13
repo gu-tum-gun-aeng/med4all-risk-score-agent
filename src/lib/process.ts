@@ -1,9 +1,9 @@
-import * as querystring from "querystring"
+import * as querystring from "querystring";
 
-import axios from "axios"
-import dayjs from "dayjs"
+import axios from "axios";
+import dayjs from "dayjs";
 
-import riskScoreApi from "../config/riskScoreApi"
+import riskScoreApi from "../config/riskScoreApi";
 
 import {
   ApiRequestBody,
@@ -11,38 +11,38 @@ import {
   Patient,
   PatientWithRiskScore,
   RiskScoreResponse,
-} from "./model"
+} from "./model";
 
 const processRiskScore = async (
-  patient: Patient
+  patient: Patient,
 ): Promise<PatientWithRiskScore> => {
   const requestHeader = {
-    "API-KEY": "",
+    "API-KEY": riskScoreApi.RISK_SCORE_API_KEY,
     "Content-Type": "application/x-www-form-urlencoded",
     Accept: "*/*",
     "Accept-Encoding": "gzip, deflate, br",
     Connection: "keep-alive",
-  } as const
+  } as const;
 
-  const requestBody: ApiRequestBody = await buildRequestBody(patient)
+  const requestBody: ApiRequestBody = await buildRequestBody(patient);
 
   const riskScoreResponse = await axios.post<RiskScoreResponse>(
-    riskScoreApi.RISK_SCORE_ENDPOINT,
+    riskScoreApi.RISK_SCORE_API_URL,
     querystring.stringify(requestBody),
-    { headers: requestHeader }
-  )
+    { headers: requestHeader },
+  );
   const patientWithRiskScore: PatientWithRiskScore = {
     ...patient,
     riskScore: riskScoreResponse.data,
-  }
-  return patientWithRiskScore
-}
+  };
+  return patientWithRiskScore;
+};
 
-type NHSOGender = "male" | "female" | "unknown"
+type NHSOGender = "male" | "female" | "unknown";
 
 const buildRequestBody = async (patient: Patient) => {
   if (!patient.cdPersonAge) {
-    return Promise.reject(new Error("no cd person age"))
+    return Promise.reject(new Error("no cd person age"));
   }
 
   const requestBody: ApiRequestBody = {
@@ -51,7 +51,7 @@ const buildRequestBody = async (patient: Patient) => {
     height: (patient.cdPersonHeightMeasure ?? 0) / 100,
     weight: patient.cdPersonWeightMeasure,
     infected_discover_date: dayjs(patient.emLaboratoryTestDate).format(
-      "YYYY-MM-DD"
+      "YYYY-MM-DD",
     ),
     sym1_chest_tightness: +patient.emPatientSymptomsCL14!,
     rf_chronic_heart_disease: +patient.emPatientDiseaseCD8!,
@@ -68,31 +68,31 @@ const buildRequestBody = async (patient: Patient) => {
     fac_bed_ridden_status: +patient.emPatientBedriddenStatus!,
     fac_diarrhea: +patient.emPatientSymptomsCL8!,
     fac_dyspnea: +patient.emPatientSymptomsCL13!,
-  }
+  };
 
-  return requestBody
-}
+  return requestBody;
+};
 
 export const mapGenderCode = (
-  genderCode: GenderCode | undefined
+  genderCode: GenderCode | undefined,
 ): undefined | NHSOGender => {
   if (genderCode === undefined) {
-    return
+    return;
   }
   switch (+genderCode) {
     case GenderCode.unknown:
-      return "unknown"
+      return "unknown";
     case GenderCode.male:
-      return "male"
+      return "male";
     case GenderCode.female:
-      return "female"
+      return "female";
     case GenderCode.notApplicable:
-      return
+      return;
     default:
-      return
+      return;
   }
-}
+};
 
 export default {
   processRiskScore,
-}
+};
