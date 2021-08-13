@@ -28,7 +28,6 @@ describe("init", () => {
 
 describe("processEachMessage", () => {
   test("should kafka publish with correct params that get from process patient", async () => {
-    const mockPartition = 1
     const mockMessageKafka = {
       offset: "1",
       value: Buffer.from(JSON.stringify({ test: "test" })),
@@ -65,7 +64,6 @@ describe("processEachMessage", () => {
       })
 
     await processEachMessage(
-      mockPartition,
       mockMessageKafka,
       mockProducerObject as unknown as Producer
     )
