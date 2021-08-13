@@ -41,7 +41,6 @@ const publish = async (
 }
 
 export const processEachMessage = async (
-  partition: number,
   message: Partial<KafkaMessage>,
   producer: Producer
 ): Promise<void> => {
@@ -75,8 +74,8 @@ const process = async (
   await consumer.subscribe({ topic: topic, fromBeginning: true })
 
   await consumer.run({
-    eachMessage: async ({ partition, message }) =>
-      await processEachMessage(partition, message, producer),
+    eachMessage: async ({ message }) =>
+      await processEachMessage(message, producer),
   })
 }
 
