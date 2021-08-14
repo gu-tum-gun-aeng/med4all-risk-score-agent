@@ -5,7 +5,7 @@
   "env": "development",
   "log": {
     "level": "trace"
-  }
+  },
   "kafka": {
     "clientId": "med4all-patient-api",
     "brokers": [
