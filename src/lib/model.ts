@@ -87,10 +87,10 @@ export type Patient = {
   readonly emPatientWaitingHours?: number
   readonly emSourceNumberCode?: number
   readonly emMoveToLocationCode?: string
-  readonly emMoveToLocationTypeCode?: number
+  readonly emMoveToLocationTypeCode?: string
   readonly emMoveFromLocationCode?: string
-  readonly emMoveFromLocationTypeCode?: number
-  readonly emMoveToMethodCode?: number
+  readonly emMoveFromLocationTypeCode?: string
+  readonly emMoveToMethodCode?: string
   readonly cdOrganizationMedicalUnit?: number
   readonly hsPatientHospitalNumber?: string
   readonly hsPatientAdmissionNumber?: string
