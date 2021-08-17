@@ -17,7 +17,6 @@ export const buildPatientInfo = (): Patient => {
     crAmpurCode: "5",
     crProvinceCode: "3",
     emPatientCommitStatusCode: 2,
-    id: 1,
     cdPersonGenderCode: GenderCode.male,
     cdPersonHeightMeasure: 176,
     cdPersonWeightMeasure: 70,

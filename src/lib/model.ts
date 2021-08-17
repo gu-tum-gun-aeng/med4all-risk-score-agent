@@ -1,5 +1,4 @@
 export type Patient = {
-  readonly id: number
   readonly cdPersonID?: string
   readonly cdPersonForeignID?: string
   readonly cdPersonPassportID?: string
