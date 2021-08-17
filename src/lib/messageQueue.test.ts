@@ -1,4 +1,4 @@
-import { Kafka, Producer } from "kafkajs"
+import { Kafka, Producer, ProducerRecord } from "kafkajs"
 import sinon from "sinon"
 
 import MessageQueue, { processEachMessage } from "./messageQueue"
@@ -7,13 +7,13 @@ import { buildPatientInfo } from "./process.test"
 
 const mockProducerObject = {
   connect: () => "connect!",
-  send: ({ topic, message }: any) => `${topic} ${message}`,
+  send: (record: ProducerRecord) => `${record.topic} ${record.messages}`,
   disconnect: () => "disconnect!",
 }
 
 const mockConsumerObject = {
   connect: () => "connect!",
-  groupId: "test-group"
+  groupId: "test-group",
 }
 
 describe("init", () => {
@@ -24,7 +24,11 @@ describe("init", () => {
     }
     const mockKafka = sinon.mock(mockKafkaJs)
     mockKafka.expects("producer").once().returns(mockProducerObject)
-    mockKafka.expects("consumer").once().withArgs({ groupId: "test-group" }).returns(mockConsumerObject)
+    mockKafka
+      .expects("consumer")
+      .once()
+      .withArgs({ groupId: "test-group" })
+      .returns(mockConsumerObject)
     MessageQueue.init(mockKafkaJs as Kafka)
 
     mockKafka.verify()

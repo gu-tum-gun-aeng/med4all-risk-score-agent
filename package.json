@@ -126,7 +126,6 @@
     }
   },
   "prettier": {
-    "doubleQuote": true,
     "semi": false
   },
   "nyc": {
