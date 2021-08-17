@@ -2,6 +2,7 @@ import { Consumer, Kafka, KafkaMessage, Producer } from "kafkajs"
 
 import KafkaConfig from "../config/kafka"
 import KafkaTopics from "../constants/kafkaTopics"
+import { logger } from "../util/logger"
 import { traceWrapperAsync } from "../util/tracer"
 
 import { Patient } from "./model"
@@ -12,9 +13,11 @@ type KafkaInstance = {
   readonly consumer: Consumer
 }
 
-const init = (kafka: Kafka): KafkaInstance => {
+const init = async (kafka: Kafka): Promise<KafkaInstance> => {
   const producer: Producer = kafka.producer()
   const consumer: Consumer = kafka.consumer({ groupId: KafkaConfig.GROUP_ID })
+  await producer.connect()
+  await consumer.connect()
   return {
     producer,
     consumer,
@@ -26,7 +29,6 @@ const publish = async (
   topic: string,
   message: string
 ): Promise<void> => {
-  await producer.connect()
   await traceWrapperAsync(
     async () => {
       await producer.send({
@@ -37,7 +39,6 @@ const publish = async (
     "external",
     "kafkaPublish"
   )
-  await producer.disconnect()
 }
 
 export const processEachMessage = async (
@@ -56,7 +57,7 @@ export const processEachMessage = async (
       JSON.stringify(patientWithRiskScore)
     )
   } catch (error) {
-    console.error(error)
+    logger.error(error)
     await publish(
       producer,
       KafkaTopics.PUBLISH_DEAD_LETTER_QUEUE_TOPIC,
@@ -70,7 +71,6 @@ const process = async (
   producer: Producer,
   topic: string
 ) => {
-  await consumer.connect()
   await consumer.subscribe({ topic: topic, fromBeginning: true })
 
   await consumer.run({
@@ -83,10 +83,6 @@ const messageQueue = {
   init,
   process,
   publish,
-}
-
-export const run = async (consumer: Consumer, producer: Producer) => {
-  await messageQueue.process(consumer, producer, KafkaTopics.CONSUME_RAW_TOPIC)
 }
 
 export default messageQueue
