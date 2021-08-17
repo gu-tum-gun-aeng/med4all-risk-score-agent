@@ -1,4 +1,4 @@
-import { ConsumerConfig, Kafka, Producer } from "kafkajs"
+import { Kafka, Producer } from "kafkajs"
 import sinon from "sinon"
 
 import MessageQueue, { processEachMessage } from "./messageQueue"
@@ -6,35 +6,28 @@ import Process from "./process"
 import { buildPatientInfo } from "./process.test"
 
 const mockProducerObject = {
-  connect: async () => Promise.resolve(),
+  connect: () => "connect!",
   send: ({ topic, message }: any) => `${topic} ${message}`,
   disconnect: () => "disconnect!",
 }
 
 const mockConsumerObject = {
-  groupId: "test-group",
-  connect: async () => Promise.resolve(),
+  connect: () => "connect!",
+  groupId: "test-group"
 }
 
 describe("init", () => {
   test("should call kafka.produce and kafka.consume when call init", async () => {
     const mockKafkaJs: unknown = {
-      producer: () => mockProducerObject,
-      consumer: (config: ConsumerConfig) => mockConsumerObject(config),
+      producer: () => "test producer",
+      consumer: () => ({ groupId: "test groupId" }),
     }
-    // const mockKafka = sinon.mock(mockKafkaJs)
-    // const mockProducer = sinon.mock(mockProducerObject)
-    // const mockConsumer = sinon.mock(mockConsumerObject)
-
-   // mockKafka.expects("producer").once()
-   // mockKafka.expects("consumer").once().withArgs({ groupId: "test-group" })
-
-    // mockProducer.expects("connect").once()
-    // mockConsumer.expects("connect").once()
-
+    const mockKafka = sinon.mock(mockKafkaJs)
+    mockKafka.expects("producer").once().returns(mockProducerObject)
+    mockKafka.expects("consumer").once().withArgs({ groupId: "test-group" }).returns(mockConsumerObject)
     MessageQueue.init(mockKafkaJs as Kafka)
 
-  //  mockKafka.verify()
+    mockKafka.verify()
   })
 })
 
@@ -77,7 +70,7 @@ describe("processEachMessage", () => {
 
     await processEachMessage(
       mockMessageKafka,
-      mockProducerObject as unknown as Producer,
+      mockProducerObject as unknown as Producer
     )
 
     mockProducer.verify()
