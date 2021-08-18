@@ -22,6 +22,7 @@ export type Patient = {
   readonly emLaboratoryTestDate?: Date
   readonly emPatientGotFavipiravir?: boolean
   readonly emPatientGotFavipiravirDate?: Date
+  readonly emPatientCommitStatusCode: number
   readonly emPatientCommitTemperature?: number
   readonly emPatientCommitPulse?: number
   readonly emPatientCommitOxygenSaturation?: number
