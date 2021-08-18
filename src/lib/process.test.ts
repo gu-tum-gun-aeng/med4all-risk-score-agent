@@ -36,6 +36,7 @@ export const buildPatientInfo = (): Patient => {
     emPatientBedriddenStatus: true,
     emPatientSymptomsCL8: true,
     emPatientSymptomsCL13: true,
+    emMoveFromLocationCode: "",
   }
 }
 

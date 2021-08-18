@@ -89,7 +89,7 @@ export type Patient = {
   readonly emSourceNumberCode?: number
   readonly emMoveToLocationCode?: string
   readonly emMoveToLocationTypeCode?: string
-  readonly emMoveFromLocationCode?: string
+  readonly emMoveFromLocationCode: string
   readonly emMoveFromLocationTypeCode?: string
   readonly emMoveToMethodCode?: string
   readonly cdOrganizationMedicalUnit?: number
