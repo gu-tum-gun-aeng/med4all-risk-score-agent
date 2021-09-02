@@ -5,9 +5,5 @@
   "env": "production",
   "log": {
     "level": "trace"
-  },
-  "cors": {
-    "origin": "your.domain.com",
-    "credentials": true
   }
 }

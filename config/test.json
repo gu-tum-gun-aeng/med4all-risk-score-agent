@@ -1,13 +1,9 @@
 {
   "app": {
-    "name": "med4all-patient-api"
+    "name": "med4all-risk-score-agent"
   },
   "env": "test",
   "log": {
     "level": "debug"
-  },
-  "cors": {
-    "origin": true,
-    "credentials": true
   }
 }

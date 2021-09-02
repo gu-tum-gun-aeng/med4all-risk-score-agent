@@ -6,10 +6,6 @@
   "log": {
     "level": "trace"
   },
-  "cors": {
-    "origin": true,
-    "credentials": true
-  },
   "kafka": {
     "clientId": "med4all-patient-api",
     "brokers": [
