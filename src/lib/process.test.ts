@@ -50,9 +50,9 @@ describe("Process", () => {
 
     test("processRiskScore should throw error if no patient data of age", async () => {
       const patientInfo = buildPatientInfo()
-      const mockPatientWithoutAge: Omit<Patient, "cdPersonAge"> = _.omit(
+      const mockPatientWithoutAge: Omit<Patient, "ageYear"> = _.omit(
         patientInfo,
-        "cdPersonAge"
+        "ageYear"
       )
       expect(Process.processRiskScore(mockPatientWithoutAge)).rejects.toEqual(
         new Error("no person age")
