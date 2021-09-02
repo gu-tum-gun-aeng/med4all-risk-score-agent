@@ -15,7 +15,8 @@ export const buildPatientInfo = (): Patient => {
     certificateId: "123456",
     certificateType: 1,
     name: "Bruno",
-    surname: "Fernandes",
+    surname: "Bruno",
+    ageYear: 25,
     gender: 1,
   }
 }
@@ -35,7 +36,7 @@ describe("Process", () => {
       stubAxiosPost.resolves({ data: expectedResultFromApi })
 
       const result: PatientWithRiskScore = await Process.processRiskScore(
-        patientInfo,
+        patientInfo
       )
 
       const expected = {
@@ -51,10 +52,10 @@ describe("Process", () => {
       const patientInfo = buildPatientInfo()
       const mockPatientWithoutAge: Omit<Patient, "cdPersonAge"> = _.omit(
         patientInfo,
-        "cdPersonAge",
+        "cdPersonAge"
       )
       expect(Process.processRiskScore(mockPatientWithoutAge)).rejects.toEqual(
-        new Error("no cd person age"),
+        new Error("no person age")
       )
     })
   })
@@ -70,7 +71,7 @@ describe("Process", () => {
       "if get %p should return %p",
       (gender: GenderCode, expected: string | undefined) => {
         expect(mapGenderCode(gender)).toEqual(expected)
-      },
+      }
     )
   })
 })

@@ -32,7 +32,8 @@
     "rtracer",
     "serializers",
     "fluentd",
-    "clust"
+    "clust",
+    "Hyperlipidemia"
   ],
   "flagWords": [],
   "ignorePaths": [
