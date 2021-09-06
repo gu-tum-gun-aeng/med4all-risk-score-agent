@@ -19,6 +19,8 @@ export type Patient = {
   readonly lineId?: string
   readonly homeTown?: number
   readonly equipments?: readonly string[]
+  readonly nhsoTicketId?: string
+  readonly trustedSource?: string
 }
 
 export type MedicalInfo = {
@@ -80,6 +82,7 @@ export type MedicalInfo = {
   readonly isSymptomPoorAppetite?: boolean
   readonly isSymptomFatique?: boolean
   readonly isDiseaseESRD?: boolean
+  readonly isSymptomGI?: boolean
 }
 
 export type Address = {
