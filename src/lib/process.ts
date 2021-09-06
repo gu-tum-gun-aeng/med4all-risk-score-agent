@@ -11,6 +11,7 @@ import {
   GenderCode,
   Patient,
   PatientWithRiskScore,
+  RiskScore,
   RiskScoreResponse,
 } from "./model"
 
@@ -33,6 +34,12 @@ const processRiskScore = async (
     { headers: requestHeader }
   )
 
+  const riskScore: RiskScore = {
+    inclusionLabel: riskScoreResponse.data.inclusion_label,
+    inclusionLabelType: riskScoreResponse.data.inclusion_label_type,
+    triageScore: riskScoreResponse.data.triage_score,
+  }
+
   await traceWrapperAsync(
     async () => {
       await axios.post<RiskScoreResponse>(
@@ -47,7 +54,7 @@ const processRiskScore = async (
 
   const patientWithRiskScore: PatientWithRiskScore = {
     ...patient,
-    riskScore: riskScoreResponse.data,
+    riskScore: riskScore,
   }
   return patientWithRiskScore
 }
@@ -97,8 +104,6 @@ export const mapGenderCode = (
     return
   }
   switch (+genderCode) {
-    case GenderCode.unknown:
-      return "unknown"
     case GenderCode.male:
       return "male"
     case GenderCode.female:

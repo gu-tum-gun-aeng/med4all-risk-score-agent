@@ -10,18 +10,15 @@ export type Patient = {
   readonly weightKg?: number
   readonly heightCm?: number
   readonly medicalInfo?: MedicalInfo
-  readonly checkInDate?: string
-  readonly checkOutDate?: string
+  readonly checkInWhen?: string
+  readonly checkOutWhen?: string
   readonly address?: Address
   readonly patientDataSource?: number
-  readonly sourceLocation?: string
   readonly admittedTo?: string
   readonly healthCoverage?: number
   readonly lineId?: string
   readonly homeTown?: number
   readonly equipments?: readonly string[]
-  readonly certificatePictureUrl?: string
-  readonly covidTestPictureUrl?: string
 }
 
 export type MedicalInfo = {
@@ -31,7 +28,7 @@ export type MedicalInfo = {
   readonly labTestWhen?: string
   readonly isFavipiravirReceived?: boolean
   readonly receivedFavipiravirWhen?: string
-  readonly bodyTemperatureCelcius?: number
+  readonly bodyTemperatureCelsius?: number
   readonly pulseRateBpm?: number
   readonly oxygenSaturation?: number
   readonly oxygenSaturationAfterExercise?: number
@@ -59,7 +56,7 @@ export type MedicalInfo = {
   readonly isSymptomLossOfTaste?: boolean
   readonly isSymptomTiredness?: boolean
   readonly isSymptomChestPain?: boolean
-  readonly isDiseaseUncontrollDm?: boolean
+  readonly isDiseaseUncontrolledDm?: boolean
   readonly isDiseaseCancer?: boolean
   readonly isDiseaseCopd?: boolean
   readonly isDiseaseAsthma?: boolean
@@ -73,10 +70,16 @@ export type MedicalInfo = {
   readonly isDiseaseCirrhosis?: boolean
   readonly isDiseaseTuberculosis?: boolean
   readonly vaccinationRecords?: readonly string[]
-  readonly firstVaccinedDate?: string
-  readonly secondVaccinedDate?: string
+  readonly firstVaccinatedWhen?: string
+  readonly secondVaccinatedWhen?: string
   readonly remark?: string
-  readonly firstDateOfSymtom?: string
+  readonly firstSymptomWhen?: string
+  readonly isMedicineRequested?: boolean
+  readonly isBypassScreening?: boolean
+  readonly isSymptomSevereCough?: boolean
+  readonly isSymptomPoorAppetite?: boolean
+  readonly isSymptomFatique?: boolean
+  readonly isDiseaseESRD?: boolean
 }
 
 export type Address = {
@@ -95,7 +98,6 @@ export type Address = {
 }
 
 export enum GenderCode {
-  unknown = 0,
   male = 1,
   female = 2,
   notApplicable = 9,
@@ -109,7 +111,13 @@ export enum CertificateType {
 }
 
 export type PatientWithRiskScore = Patient & {
-  readonly riskScore: RiskScoreResponse
+  readonly riskScore: RiskScore
+}
+
+export type RiskScore = {
+  readonly inclusionLabel: string
+  readonly inclusionLabelType: string
+  readonly triageScore: number
 }
 
 export type RiskScoreResponse = {
