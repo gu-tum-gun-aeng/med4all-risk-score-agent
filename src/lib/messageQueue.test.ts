@@ -36,6 +36,37 @@ describe("init", () => {
 })
 
 describe("processEachMessage", () => {
+  test("should publish to kafka with no risk score if isBypassScreening in medicalInfo is true", async () => {
+    const mockPatientInfo = buildPatientInfo()
+    const mockPatientInfoBypass = {
+      ...mockPatientInfo,
+      medicalInfo: {
+        isBypassScreening: true,
+      },
+    }
+    const mockMessageKafka = {
+      offset: "1",
+      value: Buffer.from(JSON.stringify(mockPatientInfoBypass)),
+    }
+    const mockProducer = sinon.mock(mockProducerObject)
+    mockProducer
+      .expects("send")
+      .once()
+      .withArgs({
+        topic: "patient.processed.main",
+        messages: [
+          {
+            value: JSON.stringify(mockPatientInfoBypass),
+          },
+        ],
+      })
+    await processEachMessage(
+      mockMessageKafka,
+      mockProducerObject as unknown as Producer
+    )
+    mockProducer.verify()
+  })
+
   test("should kafka publish with correct params that get from process patient", async () => {
     const mockMessageKafka = {
       offset: "1",
@@ -61,7 +92,7 @@ describe("processEachMessage", () => {
       .expects("send")
       .once()
       .withArgs({
-        topic: "patient.with-risk-score.main",
+        topic: "patient.processed.main",
         messages: [
           {
             value: JSON.stringify({

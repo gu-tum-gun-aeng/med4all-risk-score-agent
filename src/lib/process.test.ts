@@ -36,9 +36,8 @@ describe("Process", () => {
       const stubAxiosPost = sinon.stub(axios, "post")
       stubAxiosPost.resolves({ data: expectedResultFromApi })
 
-      const result: PatientWithRiskScore = await Process.processRiskScore(
-        patientInfo
-      )
+      const result: PatientWithRiskScore | Patient =
+        await Process.processRiskScore(patientInfo)
 
       const riskScore: RiskScore = {
         inclusionLabel: expectedResultFromApi.inclusion_label,
