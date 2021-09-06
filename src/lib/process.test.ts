@@ -6,6 +6,7 @@ import {
   GenderCode,
   Patient,
   PatientWithRiskScore,
+  RiskScore,
   RiskScoreResponse,
 } from "./model"
 import Process, { mapGenderCode } from "./process"
@@ -39,9 +40,14 @@ describe("Process", () => {
         patientInfo
       )
 
+      const riskScore: RiskScore = {
+        inclusionLabel: expectedResultFromApi.inclusion_label,
+        inclusionLabelType: expectedResultFromApi.inclusion_label_type,
+        triageScore: expectedResultFromApi.triage_score,
+      }
       const expected = {
         ...patientInfo,
-        riskScore: expectedResultFromApi,
+        riskScore: riskScore,
       }
       expect(result).toEqual(expected)
 
@@ -62,7 +68,6 @@ describe("Process", () => {
 
   describe("mapGenderCode", () => {
     const mapGenderCases = [
-      [GenderCode.unknown, "unknown"],
       [GenderCode.male, "male"],
       [GenderCode.female, "female"],
       [GenderCode.notApplicable, undefined],

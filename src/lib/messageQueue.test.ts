@@ -43,9 +43,9 @@ describe("processEachMessage", () => {
     }
     const mockPatientInfo = buildPatientInfo()
     const mockRiskScore = {
-      inclusion_label: "R2",
-      inclusion_label_type: "normal",
-      triage_score: 136,
+      inclusionLabel: "R2",
+      inclusionLabelType: "normal",
+      triageScore: 136,
     }
 
     const mockProducer = sinon.mock(mockProducerObject)
