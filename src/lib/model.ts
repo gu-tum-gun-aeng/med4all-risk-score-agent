@@ -9,6 +9,8 @@ export type Patient = {
   readonly custodianPhone?: string
   readonly weightKg?: number
   readonly heightCm?: number
+  readonly isMedicineRequested?: boolean
+  readonly isBypassScreening?: boolean
   readonly medicalInfo?: MedicalInfo
   readonly checkInWhen?: string
   readonly checkOutWhen?: string
@@ -21,6 +23,10 @@ export type Patient = {
   readonly equipments?: readonly string[]
   readonly nhsoTicketId?: string
   readonly trustedSource?: string
+  readonly isAlreadyInColink?: boolean
+  readonly isReceivedFavi?: boolean
+  readonly isRequestingBed?: boolean
+  readonly isRequestingOxygen?: boolean
 }
 
 export type MedicalInfo = {
@@ -76,8 +82,6 @@ export type MedicalInfo = {
   readonly secondVaccinatedWhen?: string
   readonly remark?: string
   readonly firstSymptomWhen?: string
-  readonly isMedicineRequested?: boolean
-  readonly isBypassScreening?: boolean
   readonly isSymptomSevereCough?: boolean
   readonly isSymptomPoorAppetite?: boolean
   readonly isSymptomFatique?: boolean

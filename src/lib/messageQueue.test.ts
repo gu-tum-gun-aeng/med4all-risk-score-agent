@@ -36,13 +36,11 @@ describe("init", () => {
 })
 
 describe("processEachMessage", () => {
-  test("should publish to kafka with no risk score if isBypassScreening in medicalInfo is true", async () => {
+  test("should publish to kafka with no risk score if isBypassScreening is true", async () => {
     const mockPatientInfo = buildPatientInfo()
     const mockPatientInfoBypass = {
       ...mockPatientInfo,
-      medicalInfo: {
-        isBypassScreening: true,
-      },
+      isBypassScreening: true,
     }
     const mockMessageKafka = {
       offset: "1",

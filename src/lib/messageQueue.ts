@@ -50,7 +50,7 @@ export const processEachMessage = async (
 
   try {
     const patient: Patient = JSON.parse(messageBuffer)
-    if (patient.medicalInfo?.isBypassScreening === true) {
+    if (patient.isBypassScreening === true) {
       await messageQueue.publish(
         producer,
         KafkaTopics.PUBLISH_PATIENT_TOPIC,
