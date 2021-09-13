@@ -21,6 +21,7 @@ export type Patient = {
   readonly equipments?: readonly string[]
   readonly nhsoTicketId?: string
   readonly trustedSource?: string
+  readonly sourceName?: string
 }
 
 export type MedicalInfo = {
