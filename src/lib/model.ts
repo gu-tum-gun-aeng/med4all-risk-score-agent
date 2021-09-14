@@ -89,15 +89,16 @@ export type MedicalInfo = {
 }
 
 export type Address = {
-  readonly provinceCode?: number
-  readonly districtCode?: number
-  readonly subDistrictCode?: number
+  readonly addressDetail?: string
+  readonly province?: string
+  readonly district?: string
+  readonly subDistrict?: string
   readonly moo?: string
   readonly road?: string
   readonly alley?: string
   readonly soi?: string
   readonly village?: string
-  readonly bangkokZoneCode?: number
+  readonly bangkokZone?: string
   readonly zipCode?: number
   readonly building?: string
   readonly note?: string
